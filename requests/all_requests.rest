@@ -1,16 +1,16 @@
-GET http://localhost:3001/api/persons
+GET http://fsopen-part2-phonebook.herokuapp.com/api/persons
 
 ###
-GET http://localhost:3001/info
+GET http://fsopen-part2-phonebook.herokuapp.com/info
 
 ###
-GET http://localhost:3001/api/persons/5
+GET http://fsopen-part2-phonebook.herokuapp.com/api/persons/5
 
 ###
-DELETE http://localhost:3001/api/persons/87915
+DELETE http://fsopen-part2-phonebook.herokuapp.com/api/persons/87915
 
 ###
-POST http://localhost:3001/api/persons HTTP/1.1
+POST http://fsopen-part2-phonebook.herokuapp.com/api/persons HTTP/1.1
 content-type: application/json
 
 {
