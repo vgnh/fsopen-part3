@@ -1,4 +1,4 @@
-// Program for testing
+// UNUSED FILE, USED FOR TESTING ONLY
 
 const mongoose = require('mongoose')
 
@@ -23,15 +23,9 @@ const personScheme = new mongoose.Schema({
 const Person = mongoose.model('Person', personScheme)
 
 if (process.argv[3] !== undefined && process.argv[4] !== undefined) {
-    /* let newId = 0
-    Person.find({}).then(result => {
-        newId = result.length + 1
-    }) */
-
     const person = new Person({
         name: process.argv[3],
         number: process.argv[4],
-        //id: newId,
     })
 
     person.save().then(result => {
