@@ -22,7 +22,7 @@ morgan.token('post-data', function postData(request) {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'))
 
-let persons = [
+/* let persons = [
   {
     name: "Arto Hellas",
     number: "040-123456",
@@ -43,7 +43,7 @@ let persons = [
     number: "39-23-6423122",
     id: 4
   }
-]
+] */
 
 /* app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -56,20 +56,21 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then(person => {
-    if (person) {
-      response.status(200).json(person)
-    }
-    else {
-      response.status(404).json({
-        error: `Person with id ${request.params.id} does not exist`
-      })
-    }
-  })
-  .catch(error => {
-    console.log(error)
-    response.status(500).end()
-  })
+  Person.findById(request.params.id)
+    .then(person => {
+      if (person) {
+        response.status(200).json(person)
+      }
+      else {
+        response.status(404).json({
+          error: `Person with id ${request.params.id} does not exist`
+        })
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      response.status(400).send({ error: 'malformatted id' })
+    })
 })
 
 app.get('/info', (request, response) => {
@@ -107,24 +108,38 @@ app.post('/api/persons', (request, response) => {
       error: "Name or number is missing"
     })
   }
-  else if (Person.find({name: body.name})) {
-    return response.status(409).json({
-      error: "name must be unique"
+
+  Person.find({ name: `${body.name}` })
+    .then(docs => {
+      if (docs.length > 0) {
+        // If name already exists
+        return response.status(409).json({
+          error: "name must be unique"
+        })
+      }
+      else {
+        // If name doesn't already exist
+        /* const person = {
+          ...body,
+          id: generateId()
+        }
+        persons = persons.concat(person) */
+        const person = new Person({
+          ...body
+        })
+
+        person.save()
+          .then(savedPerson => {
+            response.status(200).json(savedPerson)
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      }
     })
-  }
-
-  /* const person = {
-    ...body,
-    id: generateId()
-  }
-  persons = persons.concat(person) */
-  const person = new Person({
-    ...body
-  })
-
-  person.save().then(savedPerson => {
-    response.status(200).json(savedPerson)
-  })
+    .catch(error => {
+      console.log(error)
+    })
 })
 
 const PORT = process.env.PORT
