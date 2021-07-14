@@ -45,13 +45,15 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/info', (request, response) => {
-    response.status(200).send(`
-        <p>
-            Phonebook has info for ${persons.length} people<br />
-            <br />
-            ${new Date()}
-        </p>
-    `)
+    Person.countDocuments({}, function (err, count) {
+        response.status(200).send(`
+            <p>
+                Phonebook has info for ${count} people<br />
+                <br />
+                ${new Date()}
+            </p>
+        `)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -122,16 +124,11 @@ app.put('/api/persons/:id', (request, response, next) => {
         ...body
     }
 
-    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
         .catch(error => next(error))
-    /* Note.findByIdAndUpdate(request.params.id, note, { new: true })
-        .then(updatedNote => {
-            response.json(updatedNote)
-        })
-        .catch(error => next(error)) */
 })
 
 // To handle requests with unknown endpoint
