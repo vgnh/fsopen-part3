@@ -35,3 +35,12 @@ content-type: application/json
     "name": "ASDFGH",
     "number": "26765"
 }
+
+###
+PUT http://localhost:3001/api/persons/60ee54ede074af1c3bd3eac8 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "zxcv",
+    "number": "7890"
+}
