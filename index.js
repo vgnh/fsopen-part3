@@ -79,40 +79,44 @@ app.delete('/api/persons/:id', (request, response, next) => {
   return Math.floor(Math.random() * 100000)
 } */
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
-    if (!body.name || !body.number) {
-        return response.status(409).json({
+    /* if (!body.name || !body.number) {
+        return response.status(400).json({
             error: "Name or number is missing"
         })
-    }
+    } */
 
-    Person.find({ name: `${body.name}` })
+    /* Person.find({ name: `${body.name}` })
         .then(docs => {
             if (docs.length > 0) {
                 // If name already exists
-                return response.status(409).json({
+                return response.status(400).json({
                     error: "name must be unique"
                 })
             }
             else {
                 // If name doesn't already exist
-                /* const person = {
-                  ...body,
-                  id: generateId()
-                }
-                persons = persons.concat(person) */
                 const person = new Person({
                     ...body
                 })
-
                 person.save()
                     .then(savedPerson => {
                         response.status(200).json(savedPerson)
                     })
                     .catch(error => next(error))
             }
+        })
+        .catch(error => next(error)) */
+
+    const person = new Person({
+        ...body
+    })
+
+    person.save()
+        .then(savedPerson => {
+            response.status(200).json(savedPerson)
         })
         .catch(error => next(error))
 })
@@ -124,7 +128,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         ...body
     }
 
-    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true })
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -145,6 +149,9 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    }
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error) // Forward to Default Express error handler, if error is not handled here
