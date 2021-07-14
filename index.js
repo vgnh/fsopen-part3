@@ -19,29 +19,6 @@ morgan.token('post-data', function postData(request) {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'))
 
-/* let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1
-  },
-  {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-    id: 2
-  },
-  {
-    name: "Dan Abramov",
-    number: "12-43-234345",
-    id: 3
-  },
-  {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-    id: 4
-  }
-] */
-
 /* app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 }) */
@@ -132,15 +109,50 @@ app.post('/api/persons', (request, response) => {
                     .then(savedPerson => {
                         response.status(200).json(savedPerson)
                     })
-                    .catch(error => {
-                        console.log(error)
-                    })
+                    .catch(error => next(error))
             }
         })
-        .catch(error => {
-            console.log(error)
-        })
+        .catch(error => next(error))
 })
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+        ...body
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
+    /* Note.findByIdAndUpdate(request.params.id, note, { new: true })
+        .then(updatedNote => {
+            response.json(updatedNote)
+        })
+        .catch(error => next(error)) */
+})
+
+// To handle requests with unknown endpoint
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
+
+// To handle requests that result to errors
+// Custom Express error handler middleware
+// next(error) checks here first
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error) // Forward to Default Express error handler, if error is not handled here
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

@@ -25,6 +25,9 @@ GET http://localhost:3001/api/persons
 GET http://localhost:3001/api/persons/60ed3a7e308e4c2e1bfcc7e3
 
 ###
+GET http://localhost:3001/api/persons/idWithBadFormat
+
+###
 POST http://localhost:3001/api/persons HTTP/1.1
 content-type: application/json
 
